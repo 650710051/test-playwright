@@ -1,0 +1,19 @@
+test('แบบฝึกหัดที่ 3.5: ตรวจสอบการเรียงลำดับสินค้า (Sort by Price)', async ({ page }) => {
+  // Step เตรียมความพร้อม: ต้อง Login ให้สำเร็จก่อน
+  await page.goto('https://www.saucedemo.com/');
+  await page.getByPlaceholder('Username').fill('standard_user');
+  await page.getByPlaceholder('Password').fill('secret_sauce');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // 5. Sort สินค้าแบบ Price Low to High — Assert ว่าสินค้าแรกมีราคา $7.99
+  
+  // ค้นหา Dropdown โดยใช้ data-test 
+  const sortDropdown = page.locator('[data-test="product-sort-container"]');
+  
+  // ใช้คำสั่ง .selectOption() และระบุ value 'lohi' (ย่อมาจาก Low to High)
+  await sortDropdown.selectOption('lohi');
+
+  // หากล่องราคาสินค้าทั้งหมด และเลือกเฉพาะ "ชิ้นแรก" (.first()) มาตรวจสอบ
+  const firstItemPrice = page.locator('.inventory_item_price').first();
+  await expect(firstItemPrice).toHaveText('$7.99');
+});
