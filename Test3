@@ -1,0 +1,28 @@
+import { test, expect } from '@playwright/test';
+
+test('แบบฝึกหัดที่ 3: ตรวจสอบ Error Message เมื่อ Login ผิดพลาด', async ({ page }) => {
+  await page.goto('https://www.saucedemo.com/');
+
+  const usernameInput = page.getByPlaceholder('Username');
+  const passwordInput = page.getByPlaceholder('Password');
+  
+  // จำลองการกรอกรหัสผ่านผิด
+  await usernameInput.fill('standard_user');
+  await passwordInput.fill('wrong_password');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // 1. Assert ว่า Error message toBeVisible()
+  const errorMessage = page.locator('[data-test="error"]'); 
+  await expect(errorMessage).toBeVisible();
+
+  // 2. Assert ว่า Error message toContainText('do not match')
+  await expect(errorMessage).toContainText('do not match');
+
+  // 3. Assert ว่า Username field มี CSS class 'error' (กรอบแดง)
+  // ใช้ Regular Expression /error/ เพื่อค้นหาคำว่า error ในชื่อ class ทั้งหมด
+  await expect(usernameInput).toHaveClass(/error/); 
+
+  // 4. กดปุ่ม X ปิด error — Assert ว่า Error message not.toBeVisible()
+  await page.locator('.error-button').click();
+  await expect(errorMessage).not.toBeVisible();
+});
