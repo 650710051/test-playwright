@@ -1,0 +1,29 @@
+test('แบบฝึกหัดที่ 2: Filter & Cart', async ({ page }) => {
+  // 1. Login เข้าสู่ระบบ
+  await page.goto('https://www.saucedemo.com/');
+  await page.getByPlaceholder('Username').fill('standard_user');
+  await page.getByPlaceholder('Password').fill('secret_sauce');
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // สร้าง Locator สำหรับ "กล่องสินค้าทั้งหมด" เตรียมไว้ก่อน
+  const inventoryItems = page.locator('.inventory_item');
+  const cartBadge = page.locator('.shopping_cart_badge');
+
+  // 2. Add Sauce Labs Backpack ลงตะกร้า โดยใช้ filter()
+  const backpack = inventoryItems.filter({ hasText: 'Sauce Labs Backpack' });
+  await backpack.getByRole('button', { name: 'Add to cart' }).click();
+
+  // 3. Assert ว่า Cart badge แสดงเลข 1
+  await expect(cartBadge).toHaveText('1');
+
+  // 4. Add Sauce Labs Bike Light ด้วย
+  const bikeLight = inventoryItems.filter({ hasText: 'Sauce Labs Bike Light' });
+  await bikeLight.getByRole('button', { name: 'Add to cart' }).click();
+
+  // 5. Assert ว่า Cart badge แสดงเลข 2
+  await expect(cartBadge).toHaveText('2');
+
+  // 6. กดปุ่ม Remove บน Backpack — Assert ว่า badge กลับเป็น 1
+  await backpack.getByRole('button', { name: 'Remove' }).click();
+  await expect(cartBadge).toHaveText('1');
+});
