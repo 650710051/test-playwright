@@ -1,0 +1,25 @@
+import { test, expect } from '@playwright/test';
+
+test('แบบฝึกหัดที่ 1: Locators & Login', async ({ page }) => {
+  // 1. & 2. เปิดหน้าเว็บกรอกข้อมูล และกดปุ่ม Login
+  await page.goto('https://www.saucedemo.com/');
+  
+  // ใช้ getByPlaceholder เพราะช่อง input ไม่มี label
+  await page.getByPlaceholder('Username').fill('standard_user');
+  await page.getByPlaceholder('Password').fill('secret_sauce');
+  
+  // ใช้ getByRole ระบุว่าเป็นปุ่ม (button) ที่มีชื่อว่า Login
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // 3. Assert ว่า URL เปลี่ยนไปที่หน้า /inventory.html
+  await expect(page).toHaveURL(/.*inventory\.html/);
+
+  // 4. Assert ว่าหน้ามี heading ที่มีข้อความ "Products"
+  // ใช้ getByRole เช็ค heading เพื่อความเสถียรและรองรับ Accessibility
+  const heading = page.getByRole('heading', { name: 'Products' });
+  await expect(heading).toBeVisible();
+
+  // 5. Assert ว่ามีสินค้าแสดงอยู่ 6 รายการ
+  const productItems = page.locator('.inventory_item');
+  await expect(productItems).toHaveCount(6);
+});
